@@ -1,47 +1,70 @@
 # Azure-Databricks-With-Spline
-Using Spline with Azure Databricks.  See: https://absaoss.github.io/spline/
+This is a manual walkthrough of using Spline with Azure Databricks.  See: https://absaoss.github.io/spline/
 
 
 ## Azure
-1. Create a Linux VM Ubuntu 18 (enable ssh)
+1. Create a Linux VM Ubuntu 18.x (enable ssh)
 2. In the portal set the NSGs (allow inbound ports 8080, 8529, 9091)
-  - Note: check you IP tables on the VM if oyu experience connectively issues remotely.  Also, check curl locally first.
-3. NOTE: You need to replace my IP address of 52.156.70.35 with yours!
+   - Note: check you IP tables on the VM if oyu experience connectively issues remotely.  Also, check curl locally first.
+3. Note the public IP address
 
 ## Prep VM
 1. SSH to the VM
-2. Install docker: https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04
-3. Install java: sudo apt install openjdk-8-jre-headless
+2. Install Docker (run each command one by one)
+```
+sudo apt update
+
+sudo apt install apt-transport-https ca-certificates curl software-properties-common
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+
+sudo apt update
+
+apt-cache policy docker-ce
+
+sudo apt install docker-ce
+
+```
+3. Install java: 
+```
+sudo apt install openjdk-8-jre-headless
+```
 
 ## Run Arango DB
 1. Create another SSH session
-2. Run
+2. Run the Docker image
 ```
 sudo docker run -p 8529:8529 -e ARANGO_ROOT_PASSWORD=openSesame arangodb/arangodb:3.6.3
 ```
 3. On your local computer login into 
-  - http://52.156.70.35:8529
-  - username: root
-  - password: openSesame
+   - http://REPLACE_VM_IP_ADDRESS:8529
+   - username: root
+   - password: openSesame
+
 
 4. Initalize Spline database
 ```
 wget https://repo1.maven.org/maven2/za/co/absa/spline/admin/0.5.0/admin-0.5.0.jar
-java -jar admin-0.5.0.jar db-init arangodb://root:openSesame@52.156.70.35:8529/spline
+java -jar admin-0.5.0.jar db-init arangodb://root:openSesame@REPLACE_VM_IP_ADDRESS:8529/spline
 ```
+
+5. Login to Arango (again) and you should be able to select the Spline Database
+![alt tag](https://raw.githubusercontent.com/AdamPaternostro/Azure-Databricks-With-Spline/master/images/SplineLineage.png)
 
 ## Run Spline (REST Server)
 1. Create another SSH session
 2. Run the container
 ```
 sudo docker container run \
-  -e spline.database.connectionUrl="arangodb://root:openSesame@52.156.70.35:8529/spline" \
+  -e spline.database.connectionUrl="arangodb://root:openSesame@REPLACE_VM_IP_ADDRESS:8529/spline" \
   -p 9091:8080 \
   absaoss/spline-rest-server
 ```
 - Test on Linux locally: ```curl http://localhost:9091/about/version```
    - Sample Result: {"build":{"timestamp":"2020-04-28T16:40:35Z","version":"0.5.0"}}
-- Test from your machine: ```curl http://52.156.70.35:9091/about/version```
+- Test from your machine: ```curl http://REPLACE_VM_IP_ADDRESS:9091/about/version```
 
 
 ## Run Spline (User Interface)
@@ -49,11 +72,11 @@ sudo docker container run \
 2. Run the container
 ```
 sudo docker container run \
-      -e spline.consumer.url="http://52.156.70.35:9091/consumer" \
+      -e spline.consumer.url="http://REPLACE_VM_IP_ADDRESS:9091/consumer" \
       -p 9090:8080 \
       absaoss/spline-web-client
 ```
-3. Open the interface from your computer: http://52.156.70.35:9090/app/dashboard
+3. Open the interface from your computer: http://REPLACE_VM_IP_ADDRESS:9090/app/dashboard
 
 
 ## Create a Databricks 
@@ -79,8 +102,8 @@ databricks libraries install --cluster-id YOUR_CLUSTER_ID_HERE --jar "dbfs:/lib/
 ```
 System.setProperty("spline.mode", "REQUIRED")
 System.setProperty("spline.persistence.factory", "za.co.absa.spline.persistence.mongo.MongoPersistenceFactory")
-System.setProperty("spline.mongodb.url","arangodb://root:openSesame@52.156.70.35:8529/spline")
-System.setProperty("spline.producer.url","http://52.156.70.35:9091/producer")
+System.setProperty("spline.mongodb.url","arangodb://root:openSesame@REPLACE_VM_IP_ADDRESS:8529/spline")
+System.setProperty("spline.producer.url","http://REPLACE_VM_IP_ADDRESS:9091/producer")
 System.setProperty("spline.mongodb.name", "spline")
 ```
 
@@ -98,11 +121,11 @@ sql("select r1.action, count(*) as actionCount from rawData as r1 join rawData a
 
 
 ## View the Lineage in Spline
-1. Open the Spline UI:  http://52.156.70.35:9090/app/dashboard
+1. Open the Spline UI:  http://REPLACE_VM_IP_ADDRESS:9090/app/dashboard
 2. You should see something like this.
-
+![alt tag](https://raw.githubusercontent.com/AdamPaternostro/Azure-Databricks-With-Spline/master/images/SplineHomePage.png)
 3. Click on it and you should see:
-
+![alt tag](https://raw.githubusercontent.com/AdamPaternostro/Azure-Databricks-With-Spline/master/images/SplineLineage.png)
 
 ## References
 - https://absaoss.github.io/spline/
@@ -113,5 +136,5 @@ sql("select r1.action, count(*) as actionCount from rawData as r1 join rawData a
 - https://repo1.maven.org/maven2/za/co/absa/spline/spark-agent-bundle-2.4/0.4.2/
 - https://forums.databricks.com/questions/14366/install-spline-data-lineage-tracking-and-visualiza.html
 - https://databricks.com/session/spline-apache-spark-lineage-not-only-for-the-banking-industry
--# https://github.com/AbsaOSS/spline-spark-agent/blob/release/0.5.0/core/src/main/scala/za/co/absa/spline/harvester/SparkLineageInitializer.scala
+- https://github.com/AbsaOSS/spline-spark-agent/blob/release/0.5.0/core/src/main/scala/za/co/absa/spline/harvester/SparkLineageInitializer.scala
 - https://blogs.knowledgelens.com/index.php/2019/11/20/spark-data-lineage-on-databricks-notebook-using-spline/
