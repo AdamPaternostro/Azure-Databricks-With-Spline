@@ -1,12 +1,14 @@
 # Azure-Databricks-With-Spline
-This is a manual walkthrough of using Spline with Azure Databricks.  See: https://absaoss.github.io/spline/
+This is a manual walkthrough of using Spline with Azure Databricks.  Everything for Spline is installed on a single VM and this is just for testing to see how things work (not a production setup).  
+
+For Spline see: https://absaoss.github.io/spline/
 
 
 ## Azure
-1. Create a Linux VM Ubuntu 18.x (enable ssh)
+1. Create a Linux VM Ubuntu 18.x (Enable ssh)
 2. In the portal set the NSGs (allow inbound ports 8080, 8529, 9091)
-   - Note: check you IP tables on the VM if oyu experience connectively issues remotely.  Also, check curl locally first.
-3. Note the public IP address
+   - Note: Check you IP tables on the VM if you experience connectively issues remotely.
+3. Note the Public IP address of the VM
 
 ## Prep VM
 1. SSH to the VM
