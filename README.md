@@ -100,7 +100,9 @@ wget https://repo1.maven.org/maven2/za/co/absa/spline/spark-agent-bundle-2.4/0.4
 databricks fs cp spark-agent-bundle-2.4-0.4.2.jar "dbfs:/lib/spline/spark-agent-bundle-2.4-0.4.2.jar" --overwrite
 databricks libraries install --cluster-id YOUR_CLUSTER_ID_HERE --jar "dbfs:/lib/spline/spark-agent-bundle-2.4-0.4.2.jar"
 ```
-7. Create a Notebook (Scala) with 3 cells
+8. Verify the Library is installed, you can install by hand by using a DBFS path of: dbfs:/lib/spline/spark-agent-bundle-2.4-0.4.2.jar
+![alt tag](https://raw.githubusercontent.com/AdamPaternostro/Azure-Databricks-With-Spline/master/images/DatabricksLibrary.png)
+9. Create a Notebook (Scala) with 3 cells
 ```
 System.setProperty("spline.mode", "REQUIRED")
 System.setProperty("spline.persistence.factory", "za.co.absa.spline.persistence.mongo.MongoPersistenceFactory")
