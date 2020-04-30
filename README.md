@@ -53,7 +53,7 @@ java -jar admin-0.5.0.jar db-init arangodb://root:openSesame@REPLACE_VM_IP_ADDRE
 ```
 
 5. Login to Arango (again) and you should be able to select the Spline Database
-![alt tag](https://raw.githubusercontent.com/AdamPaternostro/Azure-Databricks-With-Spline/master/images/SplineLineage.png)
+![alt tag](https://raw.githubusercontent.com/AdamPaternostro/Azure-Databricks-With-Spline/master/images/Arango.png)
 
 ## Run Spline (REST Server)
 1. Create another SSH session
