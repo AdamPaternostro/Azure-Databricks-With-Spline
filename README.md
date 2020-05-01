@@ -81,17 +81,17 @@ sudo docker container run \
 3. Open the interface from your computer: http://REPLACE_VM_IP_ADDRESS:9090/app/dashboard
 
 
-## Create a Databricks 
+## Create Databricks 
 1. Create a Databricks Workspace in Azure
 2. Open the workspace
 3. Create a cluster and get the Cluster id from the URL (e.g. 0430-135102-edits521) from url: #/setting/clusters/0430-135102-edits521)
 4. Click on the user in the top right and generate an access token
-3. Install the Databricks CLI (locally, ideally on Linux on Windows you need to download the wget manually)
+3. Install the Databricks CLI 
 5. Configure Databricks CLI
 ```
 databricks configure --token
 ```
-6. Download the Spline files
+6. Download the Spline files (download by hand or using cURL on Windows)
 ```
 wget https://repo1.maven.org/maven2/za/co/absa/spline/spark-agent-bundle-2.4/0.4.2/spark-agent-bundle-2.4-0.4.2.jar
 ```
